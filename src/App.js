@@ -1,23 +1,49 @@
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+import { Input, Card } from 'antd';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [countries, setCountries] = useState([]);
+  const [countryMatch, setCountryMatch] = useState([]);
+
+  useEffect(() => {
+    const loadCountries = async () => {
+      const { data } = await axios.get('https://restcountries.com/v2/all');
+      setCountries(data);
+    };
+    loadCountries();
+  }, []);
+
+  const handleSearchCountries = (text) => {
+    if (!text) {
+      setCountryMatch([]);
+    } else {
+      let matches = countries.filter((country) => {
+        const regex = new RegExp(`${text}`, 'gi');
+        return country.name?.match(regex) || country.capital?.match(regex);
+      });
+      setCountryMatch(matches);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <h2>Country Search</h2>
+      <Input
+        style={{ width: '40%', marginTop: '10px' }}
+        placeholder='Enter country or capital name'
+        onChange={(e) => handleSearchCountries(e.target.value)}
+      />
+
+      {countryMatch &&
+        countryMatch.map((item, index) => (
+          <div key={index} style={{ marginLeft: '35%', marginTop: '5px' }}>
+            <Card style={{ width: '50%' }} title={`Country: ${item.name}`}>
+              Capital: {item.capital}
+            </Card>
+          </div>
+        ))}
     </div>
   );
 }
