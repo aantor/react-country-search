@@ -1,13 +1,16 @@
 import './App.css';
 import axios from 'axios';
 import { Input, Card } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [countryMatch, setCountryMatch] = useState([]);
+  const [countryMatch, setCountryMatch,] = useState([]);
+
+const ref = useRef(null)
 
   useEffect(() => {
+    ref.current.focus();
     const loadCountries = async () => {
       const { data } = await axios.get('https://restcountries.com/v2/all');
       setCountries(data);
@@ -34,6 +37,7 @@ function App() {
         style={{ width: '40%', marginTop: '10px' }}
         placeholder='Enter country or capital name'
         onChange={(e) => handleSearchCountries(e.target.value)}
+        ref={ref}
       />
 
       {countryMatch &&
